@@ -6,7 +6,6 @@ class CameraController {
         this.orbitRadius = 30;
         this.orbitAngle = 0;
         this.orbitHeight = 15;
-        
         this.offsets = {
             rear: new THREE.Vector3(0, 5, 15),
             side: new THREE.Vector3(15, 5, 0),
@@ -33,23 +32,19 @@ class CameraController {
 
     updateOrbitalCamera() {
         this.orbitAngle += 0.005;
-        const dronePos = this.drone.group.position;
-        
-        const x = dronePos.x + Math.sin(this.orbitAngle) * this.orbitRadius;
-        const z = dronePos.z + Math.cos(this.orbitAngle) * this.orbitRadius;
-        this.camera.position.set(x, dronePos.y + this.orbitHeight, z);
-        this.camera.lookAt(dronePos);
+        const x = Math.sin(this.orbitAngle) * this.orbitRadius;
+        const z = Math.cos(this.orbitAngle) * this.orbitRadius;
+        this.camera.position.set(x, this.orbitHeight, z);
+        this.camera.lookAt(0, 0, 0);  // Look at origin instead of drone
     }
 
     updateFollowCamera(mode) {
         const offset = this.offsets[mode];
         const dronePosition = this.drone.group.position;
         const droneRotation = this.drone.group.rotation;
-
         const cameraPosition = new THREE.Vector3();
         cameraPosition.copy(offset).applyAxisAngle(new THREE.Vector3(0, 1, 0), droneRotation.y);
         cameraPosition.add(dronePosition);
-
         this.camera.position.copy(cameraPosition);
         this.camera.lookAt(dronePosition);
     }

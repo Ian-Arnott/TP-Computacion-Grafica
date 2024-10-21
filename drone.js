@@ -21,7 +21,7 @@ class Drone {
 
         // Landing gear
         this.landingGear = new THREE.Group();
-        const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1);
+        const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 3);
         const legMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
         
         for (let i = 0; i < 4; i++) {
@@ -38,7 +38,7 @@ class Drone {
         const propellerGeometry = new THREE.BoxGeometry(4, 0.1, 0.2);
         const propellerMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
         
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 4; i++) {
             const propellerGroup = new THREE.Group();
             const propeller = new THREE.Mesh(propellerGeometry, propellerMaterial);
             propellerGroup.add(propeller);
@@ -60,19 +60,33 @@ class Drone {
         this.group.position.y = 5;
     }
 
+    abs(speed) {
+        return speed > 0 ? speed: -speed;
+    }
+
     update() {
+        // Define epsilon - you can adjust this value based on your needs
+        const EPSILON = 0.0001;
+
+        // Check if speed is smaller than epsilon
+        if (this.abs(this.speed) < EPSILON) {
+            this.speed = 0;
+        }
+
         // Rotate propellers
-        if (this.speed > 0 || this.verticalSpeed !== 0) {
+        if (this.abs(this.speed) > 0 || this.verticalSpeed !== 0) {
             this.propellers.forEach(prop => {
                 prop.rotation.y += 0.5;
             });
         }
 
         // Tilt propellers based on horizontal speed
-        const tiltAngle = (this.speed / this.maxSpeed) * Math.PI / 6;
+        const tiltAngle = -(this.speed / this.maxSpeed) * Math.PI / 6;
         this.propellers.forEach(prop => {
             prop.rotation.x = tiltAngle;
         });
+
+       
 
         // Update position
         const direction = new THREE.Vector3(0, 0, -1);
