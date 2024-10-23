@@ -99,7 +99,7 @@ function updateDroneMovement() {
 
     if (keys.q) drone.verticalSpeed = 0.2;
     else if (keys.e) drone.verticalSpeed = -0.2;
-    else drone.verticalSpeed = 0;
+    else drone.verticalSpeed = 0; // TODO: change to *= 0.5
 
     drone.update();
 }
