@@ -8,38 +8,37 @@ class Drone {
         this.isLandingGearDeployed = false;
         this.isPropellersExtended = false;
         this.isDoorOpen = false;
-        
+
         this.createDrone();
     }
 
     createDrone() {
         this.propellerGroup = new THREE.Group();
 
+        // Creating the propeller center
         const hinge = new THREE.CylinderGeometry(1,1,4,32);
         const hingeMaterial = new THREE.MeshPhongMaterial({ color: 0x93FF33 });
         const propellerHinge = new THREE.Mesh(hinge, hingeMaterial);
-        propellerHinge.rotation.x = 0.5*Math.PI;
+        propellerHinge.rotation.x = 0.5 * Math.PI;
         this.propellerGroup.add(propellerHinge);
 
         const arm = new THREE.CylinderGeometry(0.8,0.5,6,32);
         const armMaterial = new THREE.MeshPhongMaterial({ color: 0xFF6E33 });
         const propellerArm = new THREE.Mesh(arm, armMaterial);
-        propellerArm.rotation.z = 0.5*Math.PI;
+        propellerArm.rotation.z = 0.5 * Math.PI;
         propellerArm.position.x = 2.5;
         this.propellerGroup.add(propellerArm);
 
-        // Create a group for all torus segments
+        // Torus segments (remain unchanged)
         const torusSegmentsGroup = new THREE.Group();
-        
-        // Create 4 torus segments in a circle
         for (let i = 0; i < 4; i++) {
             const torusGroup = new THREE.Group();
             
             const curve = new THREE.CubicBezierCurve3(
-                new THREE.Vector3(0, 0, 2*1),      // Starting point at the end of arm
-                new THREE.Vector3(2*0.552284, 0, 2*1),    // First control point
-                new THREE.Vector3(2*1, 0, 2*0.552284),  // Second control point
-                new THREE.Vector3(2*1, 0, 0)     // End point
+                new THREE.Vector3(0, 0, 2*1),
+                new THREE.Vector3(2*0.552284, 0, 2*1),
+                new THREE.Vector3(2*1, 0, 2*0.552284),
+                new THREE.Vector3(2*1, 0, 0)
             );
             const tubeGeometry = new THREE.TubeGeometry(
                 curve,
@@ -51,23 +50,36 @@ class Drone {
             const tubeMaterial = new THREE.MeshPhongMaterial({ color: 0xE8BB01 });
             const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
             
-            // Add torus to its group
             torusGroup.add(tube);
+
+            torusGroup.rotation.y = (Math.PI / 2) * i;
+            torusGroup.position.x = 7.5;
             
-            // Rotate and position each torus segment
-            torusGroup.rotation.y = (Math.PI / 2) * i;  // Rotate 90 degrees for each segment
-            torusGroup.position.x = 7.5;  // Move out from center
-            
-            // Add the rotated and positioned torus group to the main segments group
             torusSegmentsGroup.add(torusGroup);
         }
-        
-        // Add all torus segments to the propeller group
         this.propellerGroup.add(torusSegmentsGroup);
+
+        const cylinder = new THREE.CylinderGeometry(0.2,0.2,0.4,32);
+        const cylMaterial = new THREE.MeshPhongMaterial({ color: 0xE8BB01 });
+        const propellerCenter = new THREE.Mesh(cylinder, cylMaterial);
+        propellerCenter.position.x = 7.5;
+        this.propellerGroup.add(propellerCenter);
+
+        this.propellerBlades = [];
+        const propellerBladeGeometry = new THREE.BoxGeometry(3, 0.1, 0.2);
+        const propellerBladeMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+        
+        for (let i = 0; i < 4; i++) {
+            const propellerBlade = new THREE.Mesh(propellerBladeGeometry, propellerBladeMaterial);
+            propellerBlade.position.set(7.5, 0, 0); // Position the blades at the center
+            propellerBlade.rotation.x = 0.5*Math.PI;
+            this.propellerBlades.push(propellerBlade);
+            this.propellerGroup.add(propellerBlade); // Attach blades to the propellerGroup
+        }
 
         this.group.add(this.propellerGroup);
     
-        // Main body (temporary box for now - you'll replace with curved surfaces)
+        // Main body
         const bodyGeometry = new THREE.BoxGeometry(3, 1.5, 4);
         const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 });
         this.body = new THREE.Mesh(bodyGeometry, bodyMaterial);
@@ -87,21 +99,6 @@ class Drone {
         }
         this.group.add(this.landingGear);
 
-        // Propellers
-        this.propellers = [];
-        const propellerGeometry = new THREE.BoxGeometry(4, 0.1, 0.2);
-        const propellerMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
-        
-        for (let i = 0; i < 4; i++) {
-            const propellerGroup = new THREE.Group();
-            const propeller = new THREE.Mesh(propellerGeometry, propellerMaterial);
-            propellerGroup.add(propeller);
-            propellerGroup.position.x = (i === 0 ? -2 : 2);
-            propellerGroup.position.y = 0.5;
-            this.propellers.push(propellerGroup);
-            this.group.add(propellerGroup);
-        }
-
         // Door and stairs (temporary basic geometry)
         this.door = new THREE.Mesh(
             new THREE.BoxGeometry(0.1, 1, 1),
@@ -119,17 +116,17 @@ class Drone {
     }
 
     update() {
-        // Rotate propellers
+        // Rotate the propeller blades instead of the entire group
         if (this.abs(this.speed) > 0 || this.verticalSpeed !== 0) {
-            this.propellers.forEach(prop => {
-                prop.rotation.y += 0.5;
+            this.propellerBlades.forEach(blade => {
+                blade.rotation.y += 0.5; // Adjusted to rotate the blades
             });
         }
 
         // Tilt propellers based on horizontal speed
         const tiltAngle = -(this.speed / this.maxSpeed) * Math.PI / 6;
-        this.propellers.forEach(prop => {
-            prop.rotation.x = tiltAngle;
+        this.propellerBlades.forEach(blade => {
+            blade.rotation.x = tiltAngle;
         });
 
         // Update position
