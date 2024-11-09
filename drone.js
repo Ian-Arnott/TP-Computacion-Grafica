@@ -14,8 +14,8 @@ class Drone {
     }
 
     createDrone() {
-        this.createBody();
-        this.createPropellerGroups(); // Updated to handle multiple propellers
+        // this.createBody()
+        this.createPropellerGroups();
         this.createLandingGear();
         this.createDoor();
 
@@ -28,13 +28,11 @@ class Drone {
         for (let i = 0; i < 4; i++) {
             const propellerGroup = this.createSinglePropellerGroup();
     
-            // Positioning propeller groups: 2 on each side
-            const xOffset = i < 2 ? -4 : 4; // Left or right side
-            const zOffset = i % 2 === 0 ? -3 : 3; // Front or back
+            const xOffset = i < 2 ? -4 : 4;
+            const zOffset = i % 2 === 0 ? -3 : 3;
     
-            // Apply scaling for the left-side propellers
             if (xOffset < 0) {
-                propellerGroup.scale.set(-1, 1, 1); // Mirror along x-axis
+                propellerGroup.scale.set(-1, 1, 1);
             }
     
             propellerGroup.position.set(xOffset, 0, zOffset);
@@ -116,7 +114,7 @@ class Drone {
     }
 
     createBody() {
-        const bodyGeometry = new THREE.BoxGeometry(8, 2, 8); // Resized body
+        const bodyGeometry = new THREE.BoxGeometry(8, 2, 8);
         const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 });
         this.body = new THREE.Mesh(bodyGeometry, bodyMaterial);
         this.group.add(this.body);
@@ -124,18 +122,63 @@ class Drone {
 
     createLandingGear() {
         this.landingGear = new THREE.Group();
-        const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 4); // Adjusted leg length
-        const legMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
-
-        for (let i = 0; i < 6; i++) { // Increased number of legs
+        
+        const controlPoints = [
+            new THREE.Vector2(0.3, 0),
+            new THREE.Vector2(0.25, -1),
+            new THREE.Vector2(0.2, -2),
+            new THREE.Vector2(0.4, -3)
+        ];
+        const bezierCurve = new THREE.CubicBezierCurve(
+            controlPoints[0],
+            controlPoints[1],
+            controlPoints[2],
+            controlPoints[3]
+        );
+        
+        const points = bezierCurve.getPoints(20);
+        const legGeometry = new THREE.LatheGeometry(points, 32);
+        const legMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0xFF6E33,
+            flatShading: false,
+            side: THREE.DoubleSide,
+            transparent: false,
+            opacity: 1,
+            metalness: 0.5,
+            roughness: 0.5
+        });
+    
+        const legPositions = [
+            { x: -3, z: -2.5 },
+            { x: -3, z: 2.5 },
+            { x: 3, z: -2.5 },
+            { x: 3, z: 2.5 }
+        ];
+    
+        legPositions.forEach(pos => {
             const leg = new THREE.Mesh(legGeometry, legMaterial);
-            leg.position.set(i < 3 ? -2 : 2, -1, i % 3 === 0 ? -3 : (i % 3 === 1 ? 0 : 3));
+            leg.position.set(pos.x, -1, pos.z);
+            leg.geometry.computeVertexNormals();            
             this.landingGear.add(leg);
-        }
-
+        });
+    
+        // Base of leg
+        const footGeometry = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 32);
+        const footMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0xE8BB01,
+            side: THREE.DoubleSide,
+            metalness: 0.5,
+            roughness: 0.5
+        });
+    
+        legPositions.forEach(pos => {
+            const foot = new THREE.Mesh(footGeometry, footMaterial);
+            foot.position.set(pos.x, -4, pos.z);
+            this.landingGear.add(foot);
+        });
+    
         this.group.add(this.landingGear);
     }
-
     createDoor() {
         const doorGeometry = new THREE.BoxGeometry(0.1, 1.5, 2); // Adjusted door size
         const doorMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 });
