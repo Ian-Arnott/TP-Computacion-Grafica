@@ -10,6 +10,13 @@ class Building {
         });
         this.buildingMesh = new THREE.Mesh(buildingGeometry, buildingMaterial);
         this.buildingMesh.position.y = -5
+
+        // Add windows
+        this.addWindows();
+            
+        // Add corner pillars
+        this.addCornerPillars();
+
         // Landing pad on top
         const padGeometry = new THREE.CylinderGeometry(8, 8, 1, 32);
         const padMaterial = new THREE.MeshPhongMaterial({
@@ -98,6 +105,71 @@ class Building {
         }
         
         return lights;
+    }
+
+    addWindows() {
+        // Create window rows on each side
+        const windowMaterial = new THREE.MeshPhongMaterial({
+            color: 0x87CEEB,
+            shininess: 100,
+            transparent: true,
+            opacity: 0.7
+        });
+        
+        const windowGeometry = new THREE.BoxGeometry(1.5, 2, 0.1);
+        
+        // Number of windows per row and floor
+        const windowsPerRow = 4;
+        const numberOfFloors = 8;
+        const spacing = 3;
+        
+        // Create windows for each side of the building
+        for (let floor = 0; floor < numberOfFloors; floor++) {
+            const heightPosition = -12 + floor * 3.5;
+            
+            for (let side = 0; side < 4; side++) {
+                for (let w = 0; w < windowsPerRow; w++) {
+                    const window = new THREE.Mesh(windowGeometry, windowMaterial);
+                    
+                    // Position windows
+                    const offset = (spacing * (w - (windowsPerRow - 1) / 2));
+                    
+                    window.position.y = heightPosition;
+                    
+                    if (side === 0 || side === 2) {
+                        window.position.x = offset;
+                        window.position.z = (side === 0 ? 10.1 : -10.1);
+                    } else {
+                        window.position.z = offset;
+                        window.position.x = (side === 1 ? 10.1 : -10.1);
+                        window.rotation.y = Math.PI / 2;
+                    }
+                    
+                    this.group.add(window);
+                }
+            }
+        }
+    }
+    
+    addCornerPillars() {
+        const pillarGeometry = new THREE.BoxGeometry(2, 41, 2);
+        const pillarMaterial = new THREE.MeshPhongMaterial({
+            color: 0x505050,
+            flatShading: true
+        });
+        
+        const positions = [
+            { x: 10, z: 10 },
+            { x: -10, z: 10 },
+            { x: 10, z: -10 },
+            { x: -10, z: -10 }
+        ];
+        
+        positions.forEach(pos => {
+            const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
+            pillar.position.set(pos.x, -5, pos.z);
+            this.group.add(pillar);
+        });
     }
     
     update(time) {
