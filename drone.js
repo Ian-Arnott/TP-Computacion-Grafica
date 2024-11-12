@@ -27,7 +27,7 @@ class Drone {
         this.createLandingGear();
         this.createDoor();
 
-        this.group.position.y = 30; // Initial position
+        this.group.position.y = 31.3; // Initial position
     }
 
     createBody() {

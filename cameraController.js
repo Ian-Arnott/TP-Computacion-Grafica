@@ -3,9 +3,9 @@ class CameraController {
         this.camera = camera;
         this.drone = drone;
         this.currentMode = 'orbital';
-        this.orbitRadius = 40;
+        this.orbitRadius = 60;
         this.orbitAngle = 0;
-        this.orbitHeight = 40;
+        this.orbitHeight = 30;
         this.offsets = {
             rear: new THREE.Vector3(0, 5, 20),
             side: new THREE.Vector3(20, 5, 0),

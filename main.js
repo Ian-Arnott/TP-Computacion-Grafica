@@ -3,7 +3,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87CEEB);
 
 // Add fog
-scene.fog = new THREE.FogExp2(0x87CEEB, 0.002);
+scene.fog = new THREE.FogExp2(0x87CEEB, 0.01);
 
 // Camera setup
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -25,6 +25,9 @@ scene.add(directionalLight);
 
 // Create terrain manager
 const terrainManager = new TerrainManager(scene);
+
+// Create building
+const building = new Building(scene);
 
 // Create drone
 const drone = new Drone();
@@ -107,11 +110,16 @@ function updateDroneMovement() {
 // Animation loop
 function animate() {
     requestAnimationFrame(animate);
-    
+
     updateDroneMovement();
+
     terrainManager.update(drone.group.position);
+
     cameraController.update();
-    
+
+    const time = Date.now();
+    building.update(time);
+
     renderer.render(scene, camera);
 }
 
