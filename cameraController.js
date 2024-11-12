@@ -3,12 +3,12 @@ class CameraController {
         this.camera = camera;
         this.drone = drone;
         this.currentMode = 'orbital';
-        this.orbitRadius = 30;
+        this.orbitRadius = 40;
         this.orbitAngle = 0;
-        this.orbitHeight = 15;
+        this.orbitHeight = 40;
         this.offsets = {
-            rear: new THREE.Vector3(0, 5, 15),
-            side: new THREE.Vector3(15, 5, 0),
+            rear: new THREE.Vector3(0, 5, 20),
+            side: new THREE.Vector3(20, 5, 0),
             top: new THREE.Vector3(0, 15, 0)
         };
     }
@@ -35,7 +35,7 @@ class CameraController {
         const x = Math.sin(this.orbitAngle) * this.orbitRadius;
         const z = Math.cos(this.orbitAngle) * this.orbitRadius;
         this.camera.position.set(x, this.orbitHeight, z);
-        this.camera.lookAt(0, 0, 0);  // Look at origin instead of drone
+        this.camera.lookAt(0, 0, 0);
     }
 
     updateFollowCamera(mode) {

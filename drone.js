@@ -13,7 +13,8 @@ class Drone {
         this.animations = {
             landingGear: { current: 0, target: 0 },
             propellers: { current: 0, target: 0 },
-            door: { current: 0, target: 0 }
+            door: { current: 0, target: 0 },
+            ladder: { current: 0, target: 0 }
         };
 
         this.propellerBlades = [];
@@ -26,7 +27,7 @@ class Drone {
         this.createLandingGear();
         this.createDoor();
 
-        this.group.position.y = 5; // Initial position
+        this.group.position.y = 30; // Initial position
     }
 
     createBody() {
@@ -270,9 +271,9 @@ class Drone {
             roughness: 0.4
         });
         this.door = new THREE.Mesh(doorGeometry, doorMaterial);
-        this.door.geometry.translate(0, doorHeight/2, 0);
+        this.door.geometry.translate(doorWidth/2, doorHeight/2, 0);
         
-        // Hinges (Gunmetal)
+        // Vertical Hinges (Gunmetal)
         const hingeGeometry = new THREE.CylinderGeometry(doorThickness, doorThickness, 0.3, 16);
         const hingeMaterial = new THREE.MeshPhongMaterial({ 
             color: 0x2C3539,
@@ -280,20 +281,56 @@ class Drone {
             roughness: 0.3
         });
         
-        const leftHinge = new THREE.Mesh(hingeGeometry, hingeMaterial);
-        leftHinge.rotation.z = Math.PI / 2;
-        leftHinge.position.set(-doorWidth/2 + 0.3, 0, 0);
+        const topHinge = new THREE.Mesh(hingeGeometry, hingeMaterial);
+        topHinge.position.set(0, doorHeight - 0.3, 0);
         
-        const rightHinge = new THREE.Mesh(hingeGeometry, hingeMaterial);
-        rightHinge.rotation.z = Math.PI / 2;
-        rightHinge.position.set(doorWidth/2 - 0.3, 0, 0);
+        const bottomHinge = new THREE.Mesh(hingeGeometry, hingeMaterial);
+        bottomHinge.position.set(0, 0.3, 0);
+        
+        // Create ladder
+        const ladderGroup = new THREE.Group();
+        this.ladder = ladderGroup; // Store reference to ladder for animation
+        
+        // Ladder side rails
+        const railGeometry = new THREE.CylinderGeometry(0.1, 0.1, doorHeight - 0.5, 16);
+        const railMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x808080,
+            metalness: 0.6,
+            roughness: 0.4
+        });
+        
+        const leftRail = new THREE.Mesh(railGeometry, railMaterial);
+        leftRail.position.set(0.4, doorHeight/2, 0.2);
+        
+        const rightRail = new THREE.Mesh(railGeometry, railMaterial);
+        rightRail.position.set(2.8, doorHeight/2, 0.2);
+        
+        ladderGroup.add(leftRail);
+        ladderGroup.add(rightRail);
+        
+        // Ladder rungs
+        const rungGeometry = new THREE.CylinderGeometry(0.08, 0.08, 2.4, 16);
+        const rungMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x808080,
+            metalness: 0.6,
+            roughness: 0.4
+        });
+        
+        // Add 5 rungs
+        for (let i = 0; i < 5; i++) {
+            const rung = new THREE.Mesh(rungGeometry, rungMaterial);
+            rung.rotation.z = Math.PI / 2;
+            rung.position.set(1.6, 0.5 + i * (doorHeight - 1) / 4, 0.2);
+            ladderGroup.add(rung);
+        }
         
         doorAssembly.add(this.door);
-        doorAssembly.add(leftHinge);
-        doorAssembly.add(rightHinge);
+        doorAssembly.add(topHinge);
+        doorAssembly.add(bottomHinge);
+        doorAssembly.add(ladderGroup);
         
-        doorAssembly.position.set(0, -4, 5.25);
-        
+        doorAssembly.position.set(-1.75, -4, 5.25);
+        ladderGroup.position.set(0, 0, -0.3);
         this.doorAssembly = doorAssembly;
         this.group.add(doorAssembly);
     }
@@ -345,7 +382,12 @@ class Drone {
             this.animations.door.target,
             animationSpeed
         );
-        this.door.rotation.x = this.lerp(0, Math.PI * 135 / 180, this.animations.door.current);
+        this.door.rotation.y = this.lerp(0, -Math.PI * 135 / 180, this.animations.door.current);
+        const ladderDownDistance = 3.5;
+        this.ladder.position.y = this.lerp(0, -ladderDownDistance, this.animations.door.current);
+        // const ladderOutwardRotation = -Math.PI / 6;
+        // this.ladder.rotation.x = this.lerp(0, ladderOutwardRotation, this.animations.door.current);
+    
     
         // Update position
         const direction = new THREE.Vector3(0, 0, -1);

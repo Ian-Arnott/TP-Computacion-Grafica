@@ -24,7 +24,7 @@ class TerrainChunk {
                 const zPos = (z * segmentSize) + this.z;
                 
                 let height = 0;
-                let frequency = 0.02;
+                let frequency = 0.01;
                 let amplitude = 15;
                 
                 for (let i = 0; i < 4; i++) {
