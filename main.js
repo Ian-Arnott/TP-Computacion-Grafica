@@ -7,6 +7,7 @@ const skyboxTexture = textureLoader.load("https://64.media.tumblr.com/9739a19061
     skyboxTexture.mapping = THREE.EquirectangularReflectionMapping;
     skyboxTexture.colorSpace = THREE.SRGBColorSpace;
     scene.background = skyboxTexture;
+    scene.environment = skyboxTexture;
 });
 
 
@@ -27,6 +28,9 @@ scene.add(ambientLight);
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight.position.set(50, 50, 0);
 scene.add(directionalLight);
+
+
+
 
 // Create terrain manager
 const terrainManager = new TerrainManager(scene);
