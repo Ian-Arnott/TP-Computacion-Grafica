@@ -1,9 +1,14 @@
 // Scene setup
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87CEEB);
+// scene.background = new THREE.Color(0x87CEEB);
 
-// Add fog
-scene.fog = new THREE.FogExp2(0x87CEEB, 0.01);
+const textureLoader = new THREE.TextureLoader();
+const skyboxTexture = textureLoader.load("https://64.media.tumblr.com/9739a19061cb943a6050208995a2bb40/83668255401eb369-ee/s2048x3072/ce46af4ab722c3e2c602165a4bcd26edd89b852b.jpg", () => {
+    skyboxTexture.mapping = THREE.EquirectangularReflectionMapping;
+    skyboxTexture.colorSpace = THREE.SRGBColorSpace;
+    scene.background = skyboxTexture;
+});
+
 
 // Camera setup
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);

@@ -4,7 +4,7 @@ class TerrainManager {
         this.chunks = new Map(); // Map to store active chunks
         this.chunkSize = 100;
         this.segments = 50;
-        this.loadDistance = 300; // Distance to load chunks
+        this.loadDistance = 800; // Distance to load chunks
         this.noise = new SimplexNoise();
         
         // Create chunk key from coordinates
