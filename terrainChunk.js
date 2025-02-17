@@ -87,6 +87,7 @@ class TerrainChunk {
         });
 
         this.mesh = new THREE.Mesh(this.geometry, material);
+        this.mesh.receiveShadow = true;
     }
 
     dispose() {

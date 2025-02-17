@@ -19,27 +19,41 @@ camera.position.set(50, 50, 50);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
+
+renderer.physicallyCorrectLights = true;
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 1.0;
+
 document.body.appendChild(renderer.domElement);
 
-// Lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+// Directional Light for stronger shadows
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2.0);
 directionalLight.position.set(50, 50, 0);
+directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.width = 2048;
+directionalLight.shadow.mapSize.height = 2048;
+directionalLight.shadow.camera.near = 0.5;
+directionalLight.shadow.camera.far = 500;
 scene.add(directionalLight);
 
-
-
+// Ambient light for base illumination
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+scene.add(ambientLight);
 
 // Create terrain manager
 const terrainManager = new TerrainManager(scene);
 
 // Create building
-const building = new Building(scene);
+// const building = new Building(scene);
 
 // Create drone
 const drone = new Drone();
+
 scene.add(drone.group);
 
 // Create camera controller
@@ -127,7 +141,7 @@ function animate() {
     cameraController.update();
 
     const time = Date.now();
-    building.update(time);
+    // building.update(time);
 
     renderer.render(scene, camera);
 }

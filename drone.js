@@ -18,6 +18,12 @@ class Drone {
         };
 
         this.propellerBlades = [];
+        this.textureLoader = new THREE.TextureLoader();
+        this.textures = {
+            color: this.textureLoader.load('https://64.media.tumblr.com/18e897fe5a57da94741f766d1f5f1a76/b808ced3b96f8530-68/s1280x1920/74bd1ee97102ed1822eb01957120662f0cedc916.jpg'),
+            normal: this.textureLoader.load('https://64.media.tumblr.com/c6176e5962a14fb2cbbc8b49af93547c/b808ced3b96f8530-c7/s1280x1920/fce44587890e00476841556a9dacdbad4c143e4d.pnj'),
+            metalness: this.textureLoader.load('https://64.media.tumblr.com/ddfabafef80b974d83612e1392801a53/b808ced3b96f8530-9d/s1280x1920/89f7df0aad31a3dacb7a2833d980d804a090600d.jpg'),
+        };
         this.createDrone();
     }
 
@@ -36,11 +42,15 @@ class Drone {
         // Main central body - outer shell (Deep Navy Blue)
         const bodyGeometry = new THREE.BoxGeometry(5, 5, 10.5);
         const bodyMaterial = new THREE.MeshPhongMaterial({
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x1B3C59,
-            metalness: 0.6,
+            metalness: 1.0,
             roughness: 0.4
         });
         const mainBody = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        mainBody.castShadow = true
         mainBody.position.y = -2;
         bodyGroup.add(mainBody);
     
@@ -52,12 +62,14 @@ class Drone {
             roughness: 0.8
         });
         const innerBody = new THREE.Mesh(innerGeometry, innerMaterial);
+        innerBody.castShadow = true;
         innerBody.position.set(0,-2,2.8);
         bodyGroup.add(innerBody);
     
         // Tapered nose (Matching body color)
         const noseGeometry = new THREE.CylinderGeometry(2, 3.5, 4, 4, 8, false);
         const noseMesh = new THREE.Mesh(noseGeometry, bodyMaterial);
+        noseMesh.castShadow = true;
         noseMesh.rotation.y = -Math.PI / 4;
         noseMesh.rotation.x = -Math.PI / 2;
         noseMesh.position.set(0, -2, -7.1);
@@ -66,13 +78,18 @@ class Drone {
         // Cylindrical accents (Silver)
         const accentGeo = new THREE.CylinderGeometry(4, 4, 3, 8);
         const accentMat = new THREE.MeshPhongMaterial({
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0xC0C0C0,
-            metalness: 0.8,
+            metalness: 1.0,
             roughness: 0.2
         });
         
         const accent1 = new THREE.Mesh(accentGeo, accentMat);
         const accent2 = new THREE.Mesh(accentGeo, accentMat);
+        accent1.castShadow = true;
+        accent2.castShadow = true;
         
         accent1.rotation.y = Math.PI / 8;
         accent1.rotation.x = Math.PI / 2;
@@ -116,6 +133,9 @@ class Drone {
         // Propeller hinge (Gunmetal)
         const hingeGeometry = new THREE.CylinderGeometry(1, 1, 2.5, 32);
         const hingeMaterial = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x2C3539,
             metalness: 0.7,
             roughness: 0.3
@@ -127,6 +147,9 @@ class Drone {
         // Propeller arm (Dark Silver)
         const armGeometry = new THREE.CylinderGeometry(0.8, 0.5, 6, 32);
         const armMaterial = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x808080,
             metalness: 0.6,
             roughness: 0.4
@@ -141,6 +164,9 @@ class Drone {
         // Propeller center (Matching body color)
         const centerGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.4, 32);
         const centerMaterial = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x1B3C59,
             metalness: 0.6,
             roughness: 0.4
@@ -158,6 +184,9 @@ class Drone {
         const torusSegmentsGroup = new THREE.Group();
 
         const material = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x1B3C59,
             metalness: 0.6,
             roughness: 0.4
@@ -186,6 +215,9 @@ class Drone {
     createPropellerBlades(propellerGroup) {
         const bladeGeometry = new THREE.BoxGeometry(3, 0.1, 0.2);
         const bladeMaterial = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x2C3539,
             metalness: 0.7,
             roughness: 0.3
@@ -242,6 +274,9 @@ class Drone {
         // Base of leg (Matching body color)
         const footGeometry = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 32);
         const footMaterial = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x1B3C59,
             metalness: 0.6,
             roughness: 0.4,
@@ -266,6 +301,9 @@ class Drone {
         // Door (Matching body color)
         const doorGeometry = new THREE.BoxGeometry(doorWidth, doorHeight, doorThickness);
         const doorMaterial = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x1B3C59,
             metalness: 0.6,
             roughness: 0.4
@@ -276,6 +314,9 @@ class Drone {
         // Vertical Hinges (Gunmetal)
         const hingeGeometry = new THREE.CylinderGeometry(doorThickness, doorThickness, 0.3, 16);
         const hingeMaterial = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x2C3539,
             metalness: 0.7,
             roughness: 0.3
@@ -294,6 +335,9 @@ class Drone {
         // Ladder side rails
         const railGeometry = new THREE.CylinderGeometry(0.1, 0.1, doorHeight - 0.5, 16);
         const railMaterial = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x808080,
             metalness: 0.6,
             roughness: 0.4
@@ -311,6 +355,9 @@ class Drone {
         // Ladder rungs
         const rungGeometry = new THREE.CylinderGeometry(0.08, 0.08, 2.4, 16);
         const rungMaterial = new THREE.MeshPhongMaterial({ 
+            map: this.textures.color,
+            normalMap: this.textures.normal,
+            metalnessMap: this.textures.metalness,
             color: 0x808080,
             metalness: 0.6,
             roughness: 0.4
